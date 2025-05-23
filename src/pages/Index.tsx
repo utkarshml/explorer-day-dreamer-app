@@ -74,24 +74,21 @@ const Index = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-travel-sky to-travel-ocean">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="relative mb-8">
-            <div className="w-24 h-24 mx-auto animate-globe-spin">
-              <div className="w-full h-full rounded-full travel-gradient shadow-2xl flex items-center justify-center">
-                <span className="text-4xl text-white">🌍</span>
+            <div className="w-24 h-24 mx-auto animate-pulse rounded-full border-4 border-primary">
+              <div className="w-full h-full rounded-full flex items-center justify-center">
+                <span className="text-3xl">✈️</span>
               </div>
             </div>
-            <div className="absolute -top-4 -right-4 animate-bounce-plane">
-              <span className="text-2xl">✈️</span>
-            </div>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4">Planning Your Perfect Trip</h2>
-          <p className="text-white/80 text-lg animate-pulse-slow">Creating your personalized itinerary...</p>
+          <h2 className="text-3xl font-bold mb-4">Planning Your Trip</h2>
+          <p className="text-muted-foreground text-lg animate-pulse-slow">Creating your personalized itinerary...</p>
           <div className="mt-8 flex justify-center space-x-2">
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-3 h-3 bg-primary rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+            <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
           </div>
         </div>
       </div>
@@ -99,33 +96,30 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-travel-sand via-white to-travel-sky/20">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div 
-        className="relative h-96 bg-cover bg-center flex items-center justify-center"
-        style={{
-          backgroundImage: "linear-gradient(rgba(0, 119, 190, 0.7), rgba(255, 107, 53, 0.7)), url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')"
-        }}
+        className="relative h-80 bg-cover bg-center flex items-center justify-center bg-muted"
       >
-        <div className="text-center text-white animate-fade-in">
-          <h1 className="text-5xl md:text-7xl font-bold mb-4">Dream. Plan. Explore.</h1>
-          <p className="text-xl md:text-2xl font-light">Create your perfect travel itinerary in minutes</p>
+        <div className="text-center animate-fade-in">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">Travel Planner</h1>
+          <p className="text-lg md:text-xl text-muted-foreground">Create your perfect travel itinerary in minutes</p>
         </div>
       </div>
 
       {/* Form Section */}
       <div className="container mx-auto px-4 py-16">
-        <Card className="max-w-4xl mx-auto shadow-2xl border-0 animate-slide-in-right">
+        <Card className="max-w-4xl mx-auto shadow-md animate-fade-in">
           <CardHeader className="text-center pb-8">
-            <CardTitle className="text-3xl font-bold text-travel-ocean mb-2">Plan Your Adventure</CardTitle>
-            <p className="text-muted-foreground text-lg">Tell us about your dream trip and we'll create the perfect itinerary</p>
+            <CardTitle className="text-3xl font-bold mb-2">Plan Your Trip</CardTitle>
+            <p className="text-muted-foreground">Tell us about your dream trip and we'll create the perfect itinerary</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Destination */}
               <div className="space-y-2">
-                <Label htmlFor="destination" className="text-lg font-semibold flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-travel-ocean" />
+                <Label htmlFor="destination" className="text-lg font-medium flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
                   Destination
                 </Label>
                 <Input
@@ -133,7 +127,7 @@ const Index = () => {
                   placeholder="Where would you like to go? (e.g., Paris, Tokyo, Bali)"
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
-                  className="h-12 text-lg"
+                  className="h-12"
                   required
                 />
               </div>
@@ -141,8 +135,8 @@ const Index = () => {
               {/* Travel Dates */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label className="text-lg font-semibold flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5 text-travel-ocean" />
+                  <Label className="text-lg font-medium flex items-center gap-2">
+                    <CalendarIcon className="w-4 h-4" />
                     Start Date
                   </Label>
                   <Popover>
@@ -172,7 +166,7 @@ const Index = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-lg font-semibold">End Date</Label>
+                  <Label className="text-lg font-medium">End Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -202,8 +196,8 @@ const Index = () => {
 
               {/* Number of Travelers */}
               <div className="space-y-2">
-                <Label htmlFor="travelers" className="text-lg font-semibold flex items-center gap-2">
-                  <Users className="w-5 h-5 text-travel-ocean" />
+                <Label htmlFor="travelers" className="text-lg font-medium flex items-center gap-2">
+                  <Users className="w-4 h-4" />
                   Number of Travelers
                 </Label>
                 <Input
@@ -213,15 +207,15 @@ const Index = () => {
                   max="20"
                   value={travelers}
                   onChange={(e) => setTravelers(parseInt(e.target.value))}
-                  className="h-12 text-lg"
+                  className="h-12"
                   required
                 />
               </div>
 
               {/* Travel Style */}
               <div className="space-y-4">
-                <Label className="text-lg font-semibold flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-travel-ocean" />
+                <Label className="text-lg font-medium flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
                   Travel Style
                 </Label>
                 <RadioGroup value={travelStyle} onValueChange={setTravelStyle} className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -230,7 +224,7 @@ const Index = () => {
                       <RadioGroupItem value={style.id} id={style.id} />
                       <Label 
                         htmlFor={style.id} 
-                        className="cursor-pointer px-4 py-2 rounded-lg border hover:bg-travel-ocean/10 transition-colors"
+                        className="cursor-pointer"
                       >
                         {style.label}
                       </Label>
@@ -241,7 +235,7 @@ const Index = () => {
 
               {/* Special Interests */}
               <div className="space-y-4">
-                <Label className="text-lg font-semibold">Special Interests</Label>
+                <Label className="text-lg font-medium">Special Interests</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {interestOptions.map((interest) => (
                     <div key={interest.id} className="flex items-center space-x-2">
@@ -249,13 +243,11 @@ const Index = () => {
                         id={interest.id}
                         checked={interests.includes(interest.id)}
                         onCheckedChange={(checked) => handleInterestChange(interest.id, checked as boolean)}
-                        className="interest-checkbox"
                       />
                       <Label 
                         htmlFor={interest.id} 
-                        className="cursor-pointer flex items-center gap-2 px-3 py-2 rounded-lg border hover:bg-travel-ocean/10 transition-colors text-sm"
+                        className="cursor-pointer"
                       >
-                        <span>{interest.icon}</span>
                         {interest.label}
                       </Label>
                     </div>
@@ -266,10 +258,10 @@ const Index = () => {
               {/* Submit Button */}
               <Button 
                 type="submit" 
-                className="w-full h-14 text-lg font-semibold travel-gradient hover:shadow-lg transition-all duration-300 hover:scale-105"
+                className="w-full h-14 text-lg font-semibold"
                 disabled={!destination || !startDate || !endDate || !travelStyle}
               >
-                Generate My Perfect Itinerary ✨
+                Generate My Itinerary
               </Button>
             </form>
           </CardContent>
