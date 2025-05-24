@@ -12,6 +12,42 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, MapPin, Users, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { randomUUID } from "crypto";
+
+
+// Activity inside each day
+interface Activity {
+  title: string;
+  type: string;
+  time: string;
+  location: string;
+  description: string;
+}
+
+// Each day's itinerary
+interface DayItinerary {
+  day: number;
+  date: string; // format: YYYY-MM-DD
+  weekday: string;
+  activities: Activity[];
+}
+
+// Main trip structure
+interface Trip {
+  title: string;
+  location: string;
+  start_date: string; // format: YYYY-MM-DD
+  end_date: string;   // format: YYYY-MM-DD
+  duration_days: number;
+  style: string;
+  interests: string[];
+}
+
+// Complete data structure
+export interface TripData {
+  trip: Trip;
+  itinerary: DayItinerary[];
+}
 
 const Index = () => {
   const navigate = useNavigate();
@@ -22,6 +58,7 @@ const Index = () => {
   const [endDate, setEndDate] = useState<Date>();
   const [interests, setInterests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [responseData, setResponse] = useState<TripData | null>(null);
 
   const interestOptions = [
     { id: "food", label: "Food & Dining", icon: "🍽️" },
@@ -51,25 +88,46 @@ const Index = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault();
-    setIsLoading(true);
+    try{
+      setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Store form data for the itinerary page
-    const tripData = {
-      destination,
-      startDate,
-      endDate,
-      travelers,
-      travelStyle,
-      interests
-    };
-    localStorage.setItem('tripData', JSON.stringify(tripData));
-    
-    setIsLoading(false);
-    navigate('/itinerary');
+   
+      const response = await fetch("https://utkarshml.app.n8n.cloud/webhook/ae26a56c-3c7f-4670-9b32-237e17606eb1" , {
+        method : "POST" ,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body : JSON.stringify(
+          {
+            "sessionId" : destination+travelStyle,
+            "destination": destination,
+            "start_date": startDate ? format(startDate, "yyyy-MM-dd") : "",
+            "end_date": endDate ? format(endDate, "yyyy-MM-dd") : "",
+            "number_of_travelers": travelers,
+            "travel_style": travelStyle,
+            "special_interests": interests.join(",")
+          }
+          
+        )
+      })
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setResponse(data[0].output);
+      console.log("Response Data:", data[0].output);
+      localStorage.setItem("trip", JSON.stringify(data[0].output));
+      setIsLoading(false);
+      navigate('/itinerary');
+
+    }catch(e){
+      console.error("Error in form submission:", e);
+      setIsLoading(false);
+      alert("An error occurred while generating your itinerary. Please try again.");
+    }
+   
   };
 
   if (isLoading) {
