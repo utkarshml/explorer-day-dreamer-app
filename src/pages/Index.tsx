@@ -94,31 +94,32 @@ const Index = () => {
       setIsLoading(true);
     
    
-      const response = await fetch("https://utkarshml.app.n8n.cloud/webhook/ae26a56c-3c7f-4670-9b32-237e17606eb1" , {
+      const response = await fetch("https://travilling-server.vercel.app/ask" , {
         method : "POST" ,
         headers: {
           "Content-Type": "application/json"
         },
         body : JSON.stringify(
           {
-            "sessionId" : destination+travelStyle,
             "destination": destination,
-            "start_date": startDate ? format(startDate, "yyyy-MM-dd") : "",
-            "end_date": endDate ? format(endDate, "yyyy-MM-dd") : "",
-            "number_of_travelers": travelers,
+            "startDate": startDate ? format(startDate, "yyyy-MM-dd") : "",
+            "endDate": endDate ? format(endDate, "yyyy-MM-dd") : "",
+            "travelers": travelers,
             "travel_style": travelStyle,
-            "special_interests": interests.join(",")
+            "special_interests": interests
           }
           
         )
       })
+      console.log(response)
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      setResponse(data[0].output);
-      console.log("Response Data:", data[0].output);
-      localStorage.setItem("trip", JSON.stringify(data[0].output));
+
+      setResponse(data.response);
+      console.log("Response Data:", data.response);
+      localStorage.setItem("trip", JSON.stringify(data.response));
       setIsLoading(false);
       navigate('/itinerary');
 
