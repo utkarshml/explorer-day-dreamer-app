@@ -96,14 +96,14 @@ export default function TripResults() {
             className="border-forest-secondary text-forest-secondary hover:bg-forest-light"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-2" />
-            Back to Planning
+            <span className="hidden lg:inline">Back to Planning</span>
           </Button>
-          <h1 className="text-3xl font-bold text-forest-primary">Your Journey Awaits</h1>
         </div>
+        <h1 className="text-3xl my-6 font-bold text-forest-primary">Your Journey Awaits</h1>
 
         {/* Trip Overview */}
         <Card className="mb-8 shadow-forest">
-          <CardHeader className="bg-gradient-forest text-white rounded-t-lg">
+          <CardHeader className="bg-gradient-forest text-pretty rounded-t-lg">
             <CardTitle className="text-2xl flex items-center gap-2">
               <StarIcon className="h-6 w-6" />
               {tripData.trip.title}
