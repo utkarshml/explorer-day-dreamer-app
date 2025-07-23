@@ -18,6 +18,11 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        forest: "bg-gradient-to-r from-forest-primary to-forest-secondary text-white hover:shadow-lg hover:shadow-forest-primary/25 transition-all duration-300 hover:scale-105",
+        forestOutline: "border-2 border-forest-secondary text-forest-secondary bg-transparent hover:bg-forest-secondary hover:text-white transition-all duration-300",
+        forestGhost: "text-forest-primary hover:bg-forest-light hover:text-forest-primary transition-all duration-200",
+        pink: "bg-pink-secondary text-white hover:bg-pink-secondary/90 transition-all duration-200",
+        pinkOutline: "border-2 border-pink-secondary text-pink-secondary bg-transparent hover:bg-pink-secondary hover:text-white transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",
