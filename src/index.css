@@ -17,11 +17,11 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 160 30% 15%;
 
-    --primary: 175 70% 35%;
+    --primary: 24, 100%, 49%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 330 85% 60%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 220,100%,50%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 170 25% 95%;
     --muted-foreground: 160 15% 45%;
@@ -37,10 +37,10 @@ All colors MUST be HSL.
     --ring: 175 70% 35%;
 
     /* Custom travel app colors */
-    --forest-primary: 165 45% 25%;
-    --forest-secondary: 180 55% 45%;
+    --forest-primary: 24, 100%, 49%;
+    --forest-secondary: 24, 100%, 49%;
     --forest-accent: 175 65% 60%;
-    --forest-light: 170 30% 92%;
+    --forest-light: 24, 100%, 49%;
     --forest-muted: 165 20% 85%;
     --pink-secondary: 330 85% 60%;
     --pink-light: 330 85% 95%;
