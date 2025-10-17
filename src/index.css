@@ -37,10 +37,10 @@ All colors MUST be HSL.
     --ring: 175 70% 35%;
 
     /* Custom travel app colors */
-    --forest-primary: 24, 100%, 49%;
-    --forest-secondary: 24, 100%, 49%;
+    --forest-primary: 165 45% 25%;
+    --forest-secondary: 180 55% 45%;
     --forest-accent: 175 65% 60%;
-    --forest-light: 24, 100%, 49%;
+    --forest-light: 170 30% 92%;
     --forest-muted: 165 20% 85%;
     --pink-secondary: 330 85% 60%;
     --pink-light: 330 85% 95%;

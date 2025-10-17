@@ -45,7 +45,7 @@ export function SiteHeader() {
             >
               AI
             </span>
-            <span className="text-sm font-medium tracking-wide text-foreground">Markdarshak</span>
+            <span className="text-sm font-medium tracking-wide text-foreground">Margdarshak</span>
           </Link>
  
           <div className="h-9 w-9" aria-hidden="true" />

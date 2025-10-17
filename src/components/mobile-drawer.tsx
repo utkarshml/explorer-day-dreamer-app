@@ -101,23 +101,22 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
           <div className="inline-flex items-center gap-2">
             <span
               aria-hidden="true"
-              className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground"
+              className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-secondary text-primary-foreground"
             >
-              T
+              AI
             </span>
-            <span className="text-sm font-semibold">TripCraft</span>
+            <span className="text-sm font-semibold">Margdarshak</span>
           </div>
           <button
             type="button"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border bg-secondary hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border bg-primary text-secondary-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={onClose}
             aria-label="Close menu"
           >
             <CloseIcon />
           </button>
         </div>
-
-        <nav className="px-2 py-3">
+        <nav className="">
           <ForwardNavItem href="/" onClick={onClose} ref={firstLinkRef}>
             Home
           </ForwardNavItem>
@@ -125,13 +124,6 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             Itineraries
           </ForwardNavItem>
         </nav>
-
-        {/* Special/creative touch: subtle info block */}
-        <div className="mt-auto px-4 py-3">
-          <div className="rounded-lg border bg-card p-3 text-sm text-muted-foreground">
-            {"Plan smart. Travel better."}
-          </div>
-        </div>
       </aside>
     </div>
   )

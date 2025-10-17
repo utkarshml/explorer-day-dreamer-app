@@ -84,9 +84,7 @@ export default function TripPlanner() {
     { value: "budget", label: "Budget" },
     { value: "cultural", label: "Cultural" },
     { value: "romantic", label: "Romantic" },
-    { value: "family", label: "Family" },
-    { value: "cultural", label: "Cultural" },
-    {}
+    { value: "family", label: "Family" }
   ];
 
   const interests = [
