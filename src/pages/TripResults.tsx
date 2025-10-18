@@ -1,5 +1,5 @@
-import {useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import {useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
   StarIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LoadingCard } from "@/components/LoadingCard";
 
 interface Activity {
   title: string;
@@ -28,27 +29,16 @@ interface ItineraryDay {
   weekday: string;
   activities: Activity[];
 }
-interface Itinerary {
-  duration : number
-  journey: Journey
-  itinerary : ItineraryDay[]
-}
-interface Journey {
-  startPoint: string;
-  destination: string;
-}
 
 export interface TripResponse {
-  trip: {
     title: string;
     travelers: number;
+    destination_city : string
     start_date: string;
     end_date: string;
     duration_days: number;
     style: string;
     interests: string[];
-  };
-  Itineraries: Itinerary[];
 }
 
 const colors = [
@@ -62,24 +52,101 @@ const colors = [
 export default function TripResults() {
   const navigate = useNavigate();
   const [tripData, setTripData] = useState<TripResponse | null>(null);
+  const [itineraryDay, setItineraryDay] = useState<ItineraryDay[]>([]);
+  const [cardText, setCardText] = useState("");
+  const [loadingCard, setLoadingCard] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [connected, setConnected] = useState(false);
+  const location = useLocation();
+  const ws = useRef<WebSocket | null>(null);
+  const formData = location.state?.formData;
+  
+  useEffect(() => {
+    if (!formData) {
+      navigate('/');
+    }
+  }, [formData, navigate]);
 
   useEffect(() => {
-    const data = localStorage.getItem("trip");
-    if (data) {
-      setTripData(JSON.parse(data));
-    }
-  }, [])
+    if (!formData) return;
+  
+    ws.current = new WebSocket('ws://localhost:8000/ws/stream');
+
+    ws.current.onopen = () => {
+      console.log('Connected to WebSocket');
+      setLoadingCard(true);
+      setConnected(true);
+      setLoading(true);
+      setItineraryDay([]);
+      
+      // Send form data
+      ws.current!.send(JSON.stringify(formData));
+    };
+
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.state === "START") {
+        setLoading(false);
+        setTripData(data.content);
+        setCardText(data.text || "");
+      }
+
+      if (data.state === "PLAN") {
+        setCardText(data.text || "");
+      }
+
+      if (data.state === "TOOLS") {
+        setCardText(data.text || "");
+      }
+
+      if (data.state === "OBSERVE") {
+        setCardText(data.text || "");
+      }
+      if (data.state === "RESPONSE") {
+        const day = data.content;
+        // Properly append new day to existing itinerary
+        setItineraryDay((prevDays) => [...prevDays, day]);
+        setCardText(data.content.text || "");
+      }
+      if (data.state === "END") {
+        setLoadingCard(false);
+        console.log(loadingCard);
+      }
+    };
+
+    ws.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setLoading(false);
+    };
+
+    ws.current.onclose = () => {
+      console.log('Disconnected');
+      setConnected(false);
+    };
+
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
+  }, [formData]);
  
 
 
-  if (!tripData) {
+  const handleDownloadPDF = () =>{
+    window.print();
+  }
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-forest-light to-background flex items-center justify-center">
         <Card className="p-8 text-center">
-          <h3 className="text-xl font-semibold text-destructive mb-4">Something went wrong</h3>
-          <Button onClick={() => navigate("/")} variant="outline">
-            Back to Planning
-          </Button>
+          <div className="space-y-4">
+            <div className="w-16 h-16 mx-auto border-4 border-forest-secondary border-t-transparent rounded-full animate-spin"></div>
+            <h3 className="text-xl font-semibold text-forest-primary">Crafting Your Perfect Journey</h3>
+            <p className="text-forest-primary/70">Our AI is creating a personalized itinerary just for you. Please wait for couple of minuts...</p>
+          </div>
         </Card>
       </div>
     );
@@ -102,120 +169,80 @@ export default function TripResults() {
         <h1 className="text-3xl my-6 font-bold text-forest-primary">Your Journey Awaits</h1>
 
         {/* Trip Overview */}
-        <Card className="mb-8 shadow-forest">
-          <CardHeader className="bg-gradient-forest text-pretty rounded-t-lg">
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <StarIcon className="h-6 w-6" />
-              {tripData.trip.title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-4 gap-6">
-              <div className="flex items-center gap-2">
-                <MapPinIcon className="h-5 w-5 text-forest-secondary" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Destinations</p>
-                  <p className="font-semibold text-forest-primary">{[...new Set(tripData.Itineraries.map(d => d.journey.destination))].join(", ")}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="h-5 w-5 text-forest-secondary" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Duration</p>
-                  <p className="font-semibold text-forest-primary">{tripData.trip.duration_days} days</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <UsersIcon className="h-5 w-5 text-forest-secondary" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Travelers</p>
-                  <p className="font-semibold text-forest-primary">{tripData.trip.travelers}</p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Style</p>
-                <Badge className="bg-pink-secondary text-white capitalize hover:bg-pink-secondary">
-                  {tripData.trip.style}
-                </Badge>
-              </div>
-            </div>
-
-            {tripData.trip.interests.length > 0 && (
-              <>
-                <Separator className="my-4" />
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">Interests</p>
-                  <div className="flex flex-wrap gap-2">
-                    {tripData.trip.interests.map((interest, index) => (
-                      <Badge key={index} variant="outline" className="border-pink-secondary text-pink-secondary hover:bg-pink-secondary hover:text-white transition-colors">
-                        {interest}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-      
-        {/* {formData.waypoints && formData.waypoints.length > 0 && (
-          <Card className="mb-8 shadow-card">
-            <CardHeader>
-              <CardTitle className="text-forest-primary flex items-center gap-2">
-                <MapPinIcon className="h-5 w-5" />
-                Your Journey Route
+        {tripData && (
+          <Card className="mb-8 shadow-forest">
+            <CardHeader className="bg-gradient-forest text-pretty rounded-t-lg">
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <StarIcon className="h-6 w-6" />
+                {tripData.title}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-forest-light rounded-lg">
-                  <div className="w-3 h-3 rounded-full bg-forest-secondary"></div>
-                  <span className="font-semibold text-forest-primary">{formData.startPoint}</span>
-                  <span className="text-sm text-muted-foreground">(Starting Point)</span>
+            <CardContent className="p-6">
+              <div className="grid md:grid-cols-4 gap-6">
+                <div className="flex items-center gap-2">
+                  <MapPinIcon className="h-5 w-5 text-forest-secondary" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Destinations</p>
+                    <p className="font-semibold text-forest-primary">{tripData.destination_city}</p>
+                  </div>
                 </div>
-                
-                {formData.waypoints.map((waypoint: any, index: number) => (
-                  waypoint.location && (
-                    <div key={waypoint.id} className="flex items-center gap-3 p-3 bg-pink-light/30 rounded-lg ml-6">
-                      <div className="w-3 h-3 rounded-full bg-pink-secondary"></div>
-                      <span className="text-forest-primary">{waypoint.location}</span>
-                      <Badge variant="outline" className="ml-auto border-pink-secondary text-pink-secondary">
-                        Stop {index + 1}
-                      </Badge>
-                    </div>
-                  )
-                ))}
-                
-                <div className="flex items-center gap-3 p-3 bg-forest-primary/10 rounded-lg">
-                  <div className="w-3 h-3 rounded-full bg-forest-primary"></div>
-                  <span className="font-semibold text-forest-primary">{formData.destination}</span>
-                  <span className="text-sm text-muted-foreground">(Final Destination)</span>
+
+                <div className="flex items-center gap-2">
+                  <CalendarIcon className="h-5 w-5 text-forest-secondary" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Duration</p>
+                    <p className="font-semibold text-forest-primary">{tripData.duration_days} days</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <UsersIcon className="h-5 w-5 text-forest-secondary" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Travelers</p>
+                    <p className="font-semibold text-forest-primary">{tripData.travelers}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Style</p>
+                  <Badge className="bg-pink-secondary text-white capitalize hover:bg-pink-secondary">
+                    {tripData.style}
+                  </Badge>
                 </div>
               </div>
+
+              {tripData.interests.length > 0 && (
+                <>
+                  <Separator className="my-4" />
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Interests</p>
+                    <div className="flex flex-wrap gap-2">
+                      {tripData.interests.map((interest, index) => (
+                        <Badge key={index} variant="outline" className="border-pink-secondary text-pink-secondary hover:bg-pink-secondary hover:text-white transition-colors">
+                          {interest}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
-        )}  */}
+        )}
 
-        {/* Detailed Itinerary */}
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-forest-primary">Detailed Itinerary</h2>
-          {
-            tripData.Itineraries.map((itinerary, index) => (
-              itinerary.itinerary.map((day, dayIndex) => (
-            <Card key={dayIndex} className="shadow-card">
+          {itineraryDay.length > 0 && itineraryDay.map((itinerary, index) => (
+            <Card key={`${itinerary.day}-${index}`} className="shadow-card">
               <CardHeader className="bg-forest-light">
                 <CardTitle className="flex items-center justify-between text-forest-primary">
-                  <span>Day {day.day} - {day.weekday}</span>
-                  <span className="text-sm font-normal text-forest-primary/70">{day.date}</span>
+                  <span>Day {itinerary.day} - {itinerary.weekday}</span>
+                  <span className="text-sm font-normal text-forest-primary/70">{itinerary.date}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-6">
-                  {day.activities.map((activity, activityIndex) => (
+                  {itinerary.activities.map((activity, activityIndex) => (
                     <div style={{borderColor : `${colors[index%colors.length]}`}} key={activityIndex} className={`border-l-4 pl-6 relative `}>
                       <div style={{background : `${colors[index%colors.length]}`}} className={cn(
                         "absolute -left-[9.5px] top-2 w-4 h-4 rounded-full  border border-forest"
@@ -244,7 +271,7 @@ export default function TripResults() {
                         <p className="text-forest-primary/80 leading-relaxed">{activity.description}</p>
                       </div>
 
-                      {activityIndex < day.activities.length - 1 && (
+                      {activityIndex < itinerary.activities.length - 1 && (
                         <div className="mt-4 pt-4 border-b border-pink-secondary/20"></div>
                       )}
                     </div>
@@ -252,11 +279,20 @@ export default function TripResults() {
                 </div>
               </CardContent>
             </Card>
-          ))
             ))
           }
-          {}
         </div>
+
+        {/* Detailed Itinerary */}
+        {loadingCard == true ?  (
+          <div className="mt-12">
+            <LoadingCard text={cardText} />
+          </div>
+        ) :
+        (
+          <div/>
+        )
+      }
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-12 justify-center">
@@ -268,9 +304,10 @@ export default function TripResults() {
             Plan Another Trip
           </Button>
           <Button
+            onClick={handleDownloadPDF}
             className="bg-gradient-to-r from-pink-secondary to-forest-secondary hover:shadow-lg hover:shadow-pink-secondary/25 transition-all duration-300 text-white"
           >
-            Save Itinerary
+            Trip PDF
           </Button>
         </div>
       </div>

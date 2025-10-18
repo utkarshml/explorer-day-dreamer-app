@@ -42,6 +42,45 @@ export default function TripPlanner() {
   const [openEnd, setOpenEnd] = useState(false);
   const [tripData, setTripData] = useState<TripResponse | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<LocationResult | null>(null)
+   const ws = useRef(null);
+
+   const [connected, setConnected] = useState(false);
+   const [loading, setLoading] = useState(false);
+
+
+
+   useEffect(() => {
+    // Connect to FastAPI WebSocket
+    ws.current = new WebSocket('ws://localhost:8000/ws/stream');
+
+    ws.current.onopen = () => {
+      console.log('Connected to WebSocket');
+      setConnected(true);
+    };
+
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data);
+    };
+
+    ws.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setLoading(false);
+    };
+
+    ws.current.onclose = () => {
+      console.log('Disconnected from WebSocket');
+      setConnected(false);
+    };
+
+    return () => {
+      if (ws.current) ws.current.close();
+    };
+  }, []);
+
+  
+
+
   const apiKey = "pk.2d00b08eedfd33e0137b8e3021a1b9bc"
   const [formData, setFormData] = useState({
     startPoint: "",
@@ -130,72 +169,62 @@ export default function TripPlanner() {
     }));
   };
 
-  const handleSubmit = async () => {
-    console.log(formData)
-    if (!formData.startPoint || !formData.destination || !formData.startDate || !formData.endDate || !formData.travelStyle) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
-      return;
-    }
+  // const handleSubmit = async () => {
+  //   console.log(formData)
+  //   if (!formData.startPoint || !formData.destination || !formData.startDate || !formData.endDate || !formData.travelStyle) {
+  //     toast({
+  //       title: "Missing Information",
+  //       description: "Please fill in all required fields",
+  //       variant: "destructive"
+  //     });
+  //     return;
+  //   }
 
-    setIsLoading(true);
-    const middlePoint = formData.waypoints.map((w: { location: string }) => w.location);
-    try {
-      setIsLoading(true);
-      const response = await fetch("https://travilling-server.vercel.app/ask", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(
-          {
-            "startPoint": formData.startPoint,
-            "midPoints": middlePoint,
-            "destination": formData.destination,
-            "startDate": formData.startDate ? format(formData.startDate, "yyyy-MM-dd") : "",
-            "endDate": formData.endDate ? format(formData.endDate, "yyyy-MM-dd") : "",
-            "travelers": formData.travelers,
-            "travel_style": formData.travelStyle,
-            "special_interests": formData.specialInterests
-          }
+  //   setIsLoading(true);
+  //   const middlePoint = formData.waypoints.map((w: { location: string }) => w.location);
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await fetch("https://travilling-server.vercel.app/ask", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json"
+  //       },
+  //       body: JSON.stringify(
+  //         {
+  //           "startPoint": formData.startPoint,
+  //           "midPoints": middlePoint,
+  //           "destination": formData.destination,
+  //           "startDate": formData.startDate ? format(formData.startDate, "yyyy-MM-dd") : "",
+  //           "endDate": formData.endDate ? format(formData.endDate, "yyyy-MM-dd") : "",
+  //           "travelers": formData.travelers,
+  //           "travel_style": formData.travelStyle,
+  //           "special_interests": formData.specialInterests
+  //         }
 
-        )
-      })
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      setIsLoading(false);
-      localStorage.setItem("trip", JSON.stringify(data.response));
-      setTripData(data.response);
-    } catch (e) {
-      console.error("Error in form submission:", e);
-      setIsLoading(false);
-      toast({
-        title: "Server Load",
-        description: "Please Try again",
-        variant: "destructive"
-      });
-    }
-    navigate("/results");
+  //       )
+  //     })
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
+  //     const data = await response.json();
+  //     setIsLoading(false);
+  //     localStorage.setItem("trip", JSON.stringify(data.response));
+  //     setTripData(data.response);
+  //   } catch (e) {
+  //     console.error("Error in form submission:", e);
+  //     setIsLoading(false);
+  //     toast({
+  //       title: "Server Load",
+  //       description: "Please Try again",
+  //       variant: "destructive"
+  //     });
+  //   }
+  //   navigate("/results");
+  // };
+
+  const handleSubmit = () => {
+    navigate('/results', { state: { formData } });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-forest-light to-background flex items-center justify-center">
-        <Card className="p-8 text-center">
-          <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto border-4 border-forest-secondary border-t-transparent rounded-full animate-spin"></div>
-            <h3 className="text-xl font-semibold text-forest-primary">Crafting Your Perfect Journey</h3>
-            <p className="text-forest-primary/70">Our AI is creating a personalized itinerary just for you. Please wait for couple of minuts...</p>
-          </div>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen ">
