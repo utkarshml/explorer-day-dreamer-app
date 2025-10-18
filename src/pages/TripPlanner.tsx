@@ -40,47 +40,7 @@ export default function TripPlanner() {
   const { toast } = useToast();
   const [openStart, setOpenStart] = useState(false);
   const [openEnd, setOpenEnd] = useState(false);
-  const [tripData, setTripData] = useState<TripResponse | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<LocationResult | null>(null)
-   const ws = useRef(null);
-
-   const [connected, setConnected] = useState(false);
-   const [loading, setLoading] = useState(false);
-
-
-
-   useEffect(() => {
-    // Connect to FastAPI WebSocket
-    ws.current = new WebSocket('ws://localhost:8000/ws/stream');
-
-    ws.current.onopen = () => {
-      console.log('Connected to WebSocket');
-      setConnected(true);
-    };
-
-    ws.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log(data);
-    };
-
-    ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      setLoading(false);
-    };
-
-    ws.current.onclose = () => {
-      console.log('Disconnected from WebSocket');
-      setConnected(false);
-    };
-
-    return () => {
-      if (ws.current) ws.current.close();
-    };
-  }, []);
-
-  
-
-
   const apiKey = "pk.2d00b08eedfd33e0137b8e3021a1b9bc"
   const [formData, setFormData] = useState({
     startPoint: "",
