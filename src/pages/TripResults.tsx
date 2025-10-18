@@ -70,7 +70,7 @@ export default function TripResults() {
   useEffect(() => {
     if (!formData) return;
   
-    ws.current = new WebSocket('ws://travilling-server.vercel.app/ws/stream');
+    ws.current = new WebSocket('wss://travilling-server.vercel.app/ws/stream');
 
     ws.current.onopen = () => {
       console.log('Connected to WebSocket');
